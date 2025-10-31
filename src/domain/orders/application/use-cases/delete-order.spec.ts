@@ -1,7 +1,6 @@
 import { expect } from 'vitest';
 import { InMemoryOrderRepository } from 'test/repositories/in-memory-order.repository';
 import { makeOrder } from 'test/factories/make-order';
-import { OrderStatus } from '../../entities/order';
 import { DeleteOrderUseCase } from './delete-order';
 import { FakeProcessOrderSchedule } from 'test/schedule/fake-send-email.schedule';
 

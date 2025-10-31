@@ -1,98 +1,111 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 📄 order-orchestrator API - Documentação Técnica
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## 🔹 Visão Geral
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+**order-orchestrator** foi desenvolvido em **NestJS**, com banco de dados **PostgreSQL** e **Prisma** como ORM.
 
-## Description
+API desenvolvida em NestJS para receber, validar, enriquecer e processar pedidos de forma assíncrona, utilizando filas e mecanismos de retry em caso de falhas.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 📌 Requisitos do Sistema
 
-## Project setup
+- Docker e Docker Compose
+- Node.js >= 20 (se for rodar local)
+- npm >= 10 (se for rodar local)
 
-```bash
-$ npm install
-```
+---
 
-## Compile and run the project
+## 📌 Tecnologias utilizadas
 
-```bash
-# development
-$ npm run start
+- **Nest.js**
+- **Clean Architecture & DDD (Domain-Driven Design)** – Organização do código por domínios e responsabilidades.
+- **Princípios SOLID**
+- **Redis** – Implementado para cache-aside e filas de processamento assíncrono.
+- **BullMQ** – Gestão de filas para tarefas assíncronas.
+- **Prisma ORM**.
+- **PostgreSQL**
+- **Testes unitários e E2E** – Cobertura de testes em push e pull requests, garantindo qualidade do código.
+- **Docker**.
+- **OpenTelemetry (OTel) com Jaeger**.
+- **Sentry**
+- **GitHub Actions** – CI/CD, incluindo execução de testes automatizados.
+- **Rate Limiting** – Implementado para controlar o número de requisições permitidas em um intervalo de tempo, protegendo a API contra abuso e sobrecarga.
 
-# watch mode
-$ npm run start:dev
+---
 
-# production mode
-$ npm run start:prod
-```
+## Instalação e execução
 
-## Run tests
+## Opção 1: Rodar tudo via Docker
 
 ```bash
-# unit tests
-$ npm run test
+# 1️⃣ Clonar o repositório
+git clone https://github.com/Dioneprey/order-orchestrator.git
 
-# e2e tests
-$ npm run test:e2e
+# 2️⃣ Copiar variáveis de ambiente
+cp .env.example .env
 
-# test coverage
-$ npm run test:cov
+# 3️⃣ Build e execução de todos os containers
+docker compose --profile api up --build -d
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Opção 2: Rodar localmente (Node + PNPM)
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# 1️⃣ Clonar o repositório
+git clone https://github.com/Dioneprey/order-orchestrator.git
+
+# 2️⃣ Copiar variáveis de ambiente
+cp .env.example .env
+
+# 3️⃣ Subir api em modo desenvolvimento
+docker compose up --build -d
+
+npm install           # Instalar dependências
+npm run db:deploy     # Aplicar migrations e gerar Prisma Client
+npm run start:dev     # Rodar a API
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+# 🌐 URLs
 
-## Resources
+## 📘 API
 
-Check out a few resources that may come in handy when working with NestJS:
+- Endpoint: [http://localhost:3333/api](http://localhost:3333/api)
+- Swagger: [http://localhost:3333/api/docs](http://localhost:3333/api/docs)
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+---
 
-## Support
+## 🔍 Observabilidade
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- **Jaeger (Tracing):** [http://localhost:16686](http://localhost:16686)
+- **Bull Board (Filas):** [http://localhost:3333/api/queues](http://localhost:3333/api/queues)
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Funcionalidades
 
-## License
+### Receber Pedido (Webhook)
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+`POST /webhooks/orders`
+
+**Exemplo de payload:**
+
+```json
+{
+  "order_id": "ext-123",
+  "customer": { "email": "user@example.com", "name": "Ana" },
+  "items": [{ "sku": "ABC123", "qty": 2, "unit_price": 59.9 }],
+  "currency": "USD",
+  "idempotency_key": "uuid-or-hash"
+}
+```
+
+### Consulta e Administração
+
+GET /orders — Lista pedidos (com filtro opcional por status)
+
+GET /orders/:id — Detalhes de um pedido
+
+GET /queue/metrics — Informações gerais da fila (jobs em processamento, sucesso e falhas)
+
+```
+
+```

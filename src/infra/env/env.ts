@@ -5,7 +5,9 @@ export const envSchema = z.object({
     .enum(['development', 'production', 'test'])
     .optional()
     .default('development'),
-  DATABASE_URL: z.string(),
+  DATABASE_URL: z
+    .string()
+    .default('postgres://postgres:postgres@localhost:5455/postgres'),
   DATABASE_USER: z.string().default('postgres'),
   DATABASE_PASSWORD: z.string().default('postgres'),
   DATABASE_NAME: z.string().default('postgres'),

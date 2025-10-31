@@ -1,19 +1,17 @@
 FROM node:20-alpine AS builder
 WORKDIR /usr/src/app
-RUN npm install -g pnpm
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY package.json package-lock.json ./
+RUN npm install
 COPY . .
-RUN pnpm prisma generate
-RUN pnpm run build
+RUN npx prisma generate
+RUN npm run build
 
 FROM node:20-alpine AS production
 WORKDIR /usr/src/app
-RUN npm install -g pnpm
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --prod
-RUN pnpm install prisma -D
+COPY package.json package-lock.json ./
+RUN npm install --only=production
+RUN npm install prisma --save-dev
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/prisma ./prisma
 EXPOSE 3333
-CMD ["sh", "-c", "pnpm run db:deploy && pnpm start:prod"]
+CMD ["sh", "-c", "npm run db:deploy && npm start:prod"]
