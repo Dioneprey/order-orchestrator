@@ -9,27 +9,6 @@ import { HttpModule } from './http/http.module';
 @Module({
   imports: [
     SentryModule.forRoot(),
-    LoggerModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
-        const isProduction = configService.get('NODE_ENV') === 'production';
-
-        return {
-          pinoHttp: {
-            transport: isProduction
-              ? undefined
-              : {
-                  target: 'pino-pretty',
-                  options: {
-                    singleLine: true,
-                  },
-                },
-            level: isProduction ? 'info' : 'debug',
-          },
-        };
-      },
-      inject: [ConfigService],
-    }),
     ConfigModule.forRoot({
       validate: (env) => envSchema.parse(env),
       isGlobal: true,

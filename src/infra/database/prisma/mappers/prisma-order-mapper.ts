@@ -4,6 +4,7 @@ import {
   OrderItem as PrismaOrderItem,
 } from '@generated/index';
 import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
+import { Currency } from 'src/core/types/currency';
 import { Order, OrderStatus } from 'src/domain/orders/entities/order';
 import { OrderItem } from 'src/domain/orders/entities/order-item';
 
@@ -16,16 +17,20 @@ export class PrismaOrderMapper {
     return Order.create(
       {
         ...raw,
+        currency: Currency[raw.currency],
+        convertedCurrency: raw.convertedCurrency
+          ? Currency[raw.convertedCurrency]
+          : null,
         status: OrderStatus[raw.status],
         items: raw.items
           ? raw.items.map((i) =>
               OrderItem.create({
-                orderId: new UniqueEntityID(raw.id),
-                sku: i.sku,
-                qty: i.qty,
-                unitPrice: i.unitPrice,
-                createdAt: i.createdAt,
-                updatedAt: i.updatedAt,
+                ...i,
+                convertedCurrency: i.convertedCurrency
+                  ? Currency[i.convertedCurrency]
+                  : null,
+                currency: Currency[i.currency],
+                orderId: new UniqueEntityID(i.orderId),
               }),
             )
           : undefined,

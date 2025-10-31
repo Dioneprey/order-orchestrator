@@ -4,6 +4,7 @@ import { ReceiveOrderUseCase } from './receive-order';
 import { FakeProcessOrderSchedule } from 'test/schedule/fake-send-email.schedule';
 import { randomUUID } from 'crypto';
 import { InMemoryOrderItemRepository } from 'test/repositories/in-memory-order-item.repository';
+import { Currency } from 'src/core/types/currency';
 
 let inMemoryOrderRepository: InMemoryOrderRepository;
 let inMemoryOrderItemRepository: InMemoryOrderItemRepository;
@@ -29,7 +30,7 @@ describe('Receive order', () => {
       order_id: 'ext-123',
       customer: { email: 'user@example.com', name: 'Ana' },
       items: [{ sku: 'ABC123', qty: 2, unit_price: 59.9 }],
-      currency: 'USD',
+      currency: Currency.USD,
       idempotency_key: randomUUID(),
     });
 

@@ -2,13 +2,14 @@ import { Entity } from 'src/core/entities/entity';
 import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
 import { Optional } from 'src/core/types/optional';
 import { OrderItem } from './order-item';
+import { Currency } from 'src/core/types/currency';
 
 export type OrderKey = 'id' | 'externalId' | 'idempotencyKey';
 
 export enum OrderStatus {
   RECEIVED = 'RECEIVED',
-  PROCESSING = 'PROCESSING',
-  COMPLETED = 'COMPLETED',
+  PROCESSING_ENRICHMENT = 'PROCESSING_ENRICHMENT',
+  COMPLETED_ENRICHMENT = 'COMPLETED_ENRICHMENT',
   FAILED_ENRICHMENT = 'FAILED_ENRICHMENT',
 }
 
@@ -17,14 +18,14 @@ export interface OrderProps {
   customerEmail: string;
   customerName: string;
   items?: OrderItem[];
-  currency: string;
+  currency: Currency;
   idempotencyKey: string;
   status: OrderStatus;
 
-  baseAmount?: number | null;
+  baseAmount: number;
   convertedAmount?: number | null;
   exchangeRate?: number | null;
-  convertedCurrency?: string | null;
+  convertedCurrency?: Currency | null;
 
   createdAt: Date;
   updatedAt?: Date | null;
@@ -56,7 +57,7 @@ export class Order extends Entity<OrderProps> {
     return this.props.currency;
   }
 
-  set currency(currency: string) {
+  set currency(currency: Currency) {
     this.props.currency = currency;
     this.touch();
   }
@@ -78,8 +79,8 @@ export class Order extends Entity<OrderProps> {
     return this.props.baseAmount;
   }
 
-  set baseAmount(amount: number | null | undefined) {
-    this.props.baseAmount = amount ?? null;
+  set baseAmount(amount: number) {
+    this.props.baseAmount = amount;
     this.touch();
   }
 
@@ -105,7 +106,7 @@ export class Order extends Entity<OrderProps> {
     return this.props.convertedCurrency;
   }
 
-  set convertedCurrency(currency: string | null | undefined) {
+  set convertedCurrency(currency: Currency | null | undefined) {
     this.props.convertedCurrency = currency ?? null;
     this.touch();
   }

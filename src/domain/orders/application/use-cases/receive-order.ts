@@ -6,6 +6,7 @@ import { ProcessOrderSchedule } from '../schedules/process-order.schedule';
 import { Order, OrderStatus } from '../../entities/order';
 import { OrderItem } from '../../entities/order-item';
 import { OrderItemRepository } from '../repositories/order-item.repository';
+import { Currency } from 'src/core/types/currency';
 
 export interface ReceiveOrderUseCaseRequest {
   order_id: string;
@@ -18,7 +19,7 @@ export interface ReceiveOrderUseCaseRequest {
     qty: number;
     unit_price: number;
   }[];
-  currency: string;
+  currency: Currency;
   idempotency_key: string;
 }
 
@@ -76,6 +77,7 @@ export class ReceiveOrderUseCase {
         qty: item.qty,
         sku: item.sku,
         unitPrice: item.unit_price,
+        currency,
       });
     });
 
@@ -87,7 +89,7 @@ export class ReceiveOrderUseCase {
         orderId: order.id.toString(),
       },
       {
-        jobId: idempotency_key,
+        jobId: order.id.toString(),
         removeOnComplete: false,
         removeOnFail: false,
         attempts: 3,

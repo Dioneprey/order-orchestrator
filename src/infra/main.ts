@@ -7,7 +7,6 @@ import {
 } from '@nestjs/platform-fastify';
 import { ConfigService } from '@nestjs/config';
 import { EnvService } from './env/env.service';
-import { Logger } from 'nestjs-pino';
 import { Env } from './env/env';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as Sentry from '@sentry/nestjs';
@@ -52,8 +51,6 @@ async function bootstrap() {
     origin: ['*'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   });
-
-  app.useLogger(app.get(Logger));
 
   if (sentryDsn) {
     Sentry.init({

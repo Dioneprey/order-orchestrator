@@ -13,6 +13,10 @@ import {
 } from './processor/bullmq-process-order.processor';
 import { ProcessOrderSchedule } from 'src/domain/orders/application/schedules/process-order.schedule';
 import { BullMQProcessOrderScheduleService } from './service/bullmq-process-order-schedule.service';
+import {
+  BullMQDLQProcessOrderProcessor,
+  DLQ_PROCESS_ORDER_PROCESSOR,
+} from './processor/bullmq-dlq-process-order.processor';
 
 @Module({
   imports: [
@@ -33,6 +37,9 @@ import { BullMQProcessOrderScheduleService } from './service/bullmq-process-orde
     BullModule.registerQueue({
       name: PROCESS_ORDER_PROCESSOR,
     }),
+    BullModule.registerQueue({
+      name: DLQ_PROCESS_ORDER_PROCESSOR,
+    }),
 
     BullBoardModule.forRoot({
       route: '/queues',
@@ -42,9 +49,14 @@ import { BullMQProcessOrderScheduleService } from './service/bullmq-process-orde
       name: PROCESS_ORDER_PROCESSOR,
       adapter: BullMQAdapter,
     }),
+    BullBoardModule.forFeature({
+      name: DLQ_PROCESS_ORDER_PROCESSOR,
+      adapter: BullMQAdapter,
+    }),
   ],
   providers: [
     BullMQProcessOrderProcessor,
+    BullMQDLQProcessOrderProcessor,
     {
       provide: ProcessOrderSchedule,
       useClass: BullMQProcessOrderScheduleService,

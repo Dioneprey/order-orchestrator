@@ -25,6 +25,22 @@ export class InMemoryOrderItemRepository implements OrderItemRepository {
     return orderItems;
   }
 
+  async saveMany(orderItems: OrderItem[]): Promise<OrderItem[]> {
+    for (const item of orderItems) {
+      const index = this.items.findIndex((i) => i.id === item.id);
+
+      if (index !== -1) {
+        // Atualiza item existente
+        this.items[index] = item;
+      } else {
+        // Adiciona novo item
+        this.items.push(item);
+      }
+    }
+
+    return orderItems;
+  }
+
   async save(orderItem: OrderItem): Promise<OrderItem> {
     const index = this.items.findIndex(
       (item) => item.id.toString() === orderItem.id.toString(),

@@ -11,7 +11,8 @@ export abstract class OrderItemRepository {
     value,
   }: OrderItemRepositoryFindByUniqueFieldProps): Promise<OrderItem | null>;
 
-  abstract createMany(orderItem: OrderItem[]): Promise<OrderItem[]>;
+  abstract createMany(orderItems: OrderItem[]): Promise<OrderItem[]>;
+  abstract saveMany(orderItems: OrderItem[]): Promise<OrderItem[]>;
 
   abstract save(orderItem: OrderItem): Promise<OrderItem>;
   abstract delete(orderItem: OrderItem): Promise<void>;

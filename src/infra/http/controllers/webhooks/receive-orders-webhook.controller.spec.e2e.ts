@@ -8,7 +8,6 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
 import { randomUUID } from 'crypto';
 import { EnvService } from 'src/infra/env/env.service';
 

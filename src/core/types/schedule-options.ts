@@ -5,10 +5,9 @@ export interface ScheduleOptions {
   attempts?: number;
   jobId?: string;
   removeOnFail?: boolean;
-  onComplete?: boolean;
   removeOnComplete?: boolean;
   backoff?: {
     type: 'fixed' | 'exponential';
-    delay?: number;
+    delay: number;
   };
 }

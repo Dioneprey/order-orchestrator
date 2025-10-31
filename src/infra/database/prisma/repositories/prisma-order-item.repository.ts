@@ -7,7 +7,11 @@ import {
   OrderItemRepositoryFindByUniqueFieldProps,
 } from 'src/domain/orders/application/repositories/order-item.repository';
 import { PrismaOrderItemMapper } from '../mappers/prisma-order-item-mapper';
-import { OrderItem } from 'src/domain/orders/entities/order-item';
+import { OrderItem, OrderItemKey } from 'src/domain/orders/entities/order-item';
+import { buildCacheKey } from 'src/core/helpers/buid-cache-key';
+import { OrderKey } from 'src/domain/orders/entities/order';
+
+const orderKeys: OrderKey[] = ['id', 'externalId', 'idempotencyKey'];
 
 @Injectable()
 export class PrismaOrderItemRepository implements OrderItemRepository {
@@ -19,7 +23,10 @@ export class PrismaOrderItemRepository implements OrderItemRepository {
     key,
     value,
   }: OrderItemRepositoryFindByUniqueFieldProps) {
-    const cacheKey = `order-item:${key}:${value}`;
+    const cacheKey = buildCacheKey({
+      baseKey: `order-item:${key}:${value}`,
+    });
+
     const cached = await this.redisRepository.get<PrismaOrderItem>(cacheKey);
 
     if (cached) {
@@ -48,6 +55,87 @@ export class PrismaOrderItemRepository implements OrderItemRepository {
       data: items,
     });
 
+    const orderItemKeys: OrderItemKey[] = ['id'];
+
+    const promises: Promise<any>[] = [];
+
+    orderItems.forEach((item) => {
+      orderItemKeys.forEach((key) => {
+        promises.push(
+          this.redisRepository.purgeByPrefix(`order-item:${key}:${item[key]}`),
+        );
+      });
+    });
+
+    promises.push(this.redisRepository.purgeByPrefix(`order:all`));
+
+    const orderId = orderItems[0].orderId.toString();
+
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
+    });
+
+    if (order) {
+      orderKeys.forEach((key) => {
+        promises.push(
+          this.redisRepository.purgeByPrefix(`order:${key}:${order[key]}`),
+        );
+      });
+    }
+
+    await Promise.all(promises);
+
+    return orderItems;
+  }
+
+  async saveMany(orderItems: OrderItem[]) {
+    if (!orderItems.length) return [];
+
+    const orderId = orderItems[0].orderId.toString();
+
+    const items = orderItems.map(PrismaOrderItemMapper.toPrisma);
+
+    await this.prisma.$transaction([
+      this.prisma.orderItem.deleteMany({
+        where: { orderId },
+      }),
+      this.prisma.orderItem.createMany({
+        data: items,
+      }),
+    ]);
+
+    const orderItemKeys: OrderItemKey[] = ['id'];
+
+    const promises: Promise<any>[] = [];
+
+    orderItems.forEach((item) => {
+      orderItemKeys.forEach((key) => {
+        promises.push(
+          this.redisRepository.purgeByPrefix(`order-item:${key}:${item[key]}`),
+        );
+      });
+    });
+
+    promises.push(this.redisRepository.purgeByPrefix(`order:all`));
+
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
+    });
+
+    if (order) {
+      orderKeys.forEach((key) => {
+        promises.push(
+          this.redisRepository.purgeByPrefix(`order:${key}:${order[key]}`),
+        );
+      });
+    }
+
+    await Promise.all(promises);
+
     return orderItems;
   }
 
@@ -61,13 +149,34 @@ export class PrismaOrderItemRepository implements OrderItemRepository {
       data: data,
     });
 
-    await Promise.all([
-      ...Object.keys(updatedOrderItem).map((key) =>
+    const orderItemKeys: OrderItemKey[] = ['id'];
+    const promises: Promise<any>[] = [];
+
+    orderItemKeys.forEach((key) => {
+      promises.push(
         this.redisRepository.purgeByPrefix(
           `order-item:${key}:${updatedOrderItem[key]}`,
         ),
-      ),
-    ]);
+      );
+    });
+
+    promises.push(this.redisRepository.purgeByPrefix(`order:all`));
+
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id: data.orderId,
+      },
+    });
+
+    if (order) {
+      orderKeys.forEach((key) => {
+        promises.push(
+          this.redisRepository.purgeByPrefix(`order:${key}:${order[key]}`),
+        );
+      });
+    }
+
+    await Promise.all(promises);
 
     return PrismaOrderItemMapper.toDomain(updatedOrderItem);
   }
@@ -81,10 +190,31 @@ export class PrismaOrderItemRepository implements OrderItemRepository {
       },
     });
 
-    await Promise.all([
-      ...Object.keys(data).map((key) =>
+    const orderItemKeys: OrderItemKey[] = ['id'];
+    const promises: Promise<any>[] = [];
+
+    orderItemKeys.forEach((key) => {
+      promises.push(
         this.redisRepository.purgeByPrefix(`order-item:${key}:${data[key]}`),
-      ),
-    ]);
+      );
+    });
+
+    promises.push(this.redisRepository.purgeByPrefix(`order:all`));
+
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id: data.orderId,
+      },
+    });
+
+    if (order) {
+      orderKeys.forEach((key) => {
+        promises.push(
+          this.redisRepository.purgeByPrefix(`order:${key}:${order[key]}`),
+        );
+      });
+    }
+
+    await Promise.all(promises);
   }
 }

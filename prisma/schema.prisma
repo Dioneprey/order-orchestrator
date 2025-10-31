@@ -16,9 +16,14 @@ datasource db {
 
 enum OrderStatus {
   RECEIVED
-  PROCESSING
-  COMPLETED
+  PROCESSING_ENRICHMENT
+  COMPLETED_ENRICHMENT
   FAILED_ENRICHMENT
+}
+
+enum Currency {
+  USD
+  BRL
 }
 
 model Order {
@@ -26,14 +31,14 @@ model Order {
   externalId     String      @map("external_id")
   customerEmail  String      @map("customer_email")
   customerName   String      @map("customer_name")
-  currency       String
+  currency       Currency
   idempotencyKey String      @unique @map("idempotency_key")
   status         OrderStatus @default(RECEIVED)
 
-  baseAmount        Float?  @map("base_amount")
-  convertedAmount   Float?  @map("converted_amount")
-  exchangeRate      Float?  @map("exchange_rate")
-  convertedCurrency String? @map("converted_currency")
+  baseAmount        Float     @map("base_amount")
+  convertedAmount   Float?    @map("converted_amount")
+  exchangeRate      Float?    @map("exchange_rate")
+  convertedCurrency Currency? @map("converted_currency")
 
   items OrderItem[]
 
@@ -45,13 +50,18 @@ model Order {
 }
 
 model OrderItem {
-  id        String @id @default(uuid(7))
-  orderId   String
-  sku       String
-  qty       Int
-  unitPrice Float  @map("unit_price")
+  id       String   @id @default(uuid(7))
+  orderId  String
+  sku      String
+  qty      Int
+  currency Currency
 
-  order Order @relation(fields: [orderId], references: [id])
+  unitPrice          Float     @map("unit_price")
+  convertedUnitPrice Float?    @map("converted_unit_price")
+  convertedCurrency  Currency? @map("converted_currency")
+  exchangeRate       Float?    @map("exchange_rate")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")

@@ -15,8 +15,10 @@ import {
   ApiOperation,
   ApiResponse,
   ApiSecurity,
+  ApiTags,
 } from '@nestjs/swagger';
 import { OrderPresenter } from '../../presenters/order-presenter';
+import { Currency } from 'src/core/types/currency';
 
 export const receiveOrderBodySchema = z.object({
   order_id: z.string(),
@@ -31,13 +33,14 @@ export const receiveOrderBodySchema = z.object({
       unit_price: z.number(),
     }),
   ),
-  currency: z.string(),
+  currency: z.enum(Currency),
   idempotency_key: z.string(),
 });
 
 type ReceiveOrderBody = z.infer<typeof receiveOrderBodySchema>;
 const bodyValidationPipe = new ZodValidationPipe(receiveOrderBodySchema);
 
+@ApiTags('webhooks')
 @Controller('/webhooks/orders')
 export class ReceiveOrdersController {
   constructor(private receiveOrderUseCase: ReceiveOrderUseCase) {}
@@ -46,7 +49,7 @@ export class ReceiveOrdersController {
   @ApiSecurity('x-api-key')
   @HttpCode(201)
   @ApiOperation({
-    summary: 'Receive a new order via webhook',
+    summary: 'Recebe novo pedido via webhook',
     description:
       'Recebe um pedido externo, garante idempotência, persiste no banco e enfileira para processamento',
   })
@@ -79,7 +82,7 @@ export class ReceiveOrdersController {
   @ApiResponse({
     status: 400,
     description: 'Requisição inválida',
-    schema: { example: { message: 'Erro de requisição' } },
+    schema: { example: { message: 'Bad Request' } },
   })
   async handle(@Body(bodyValidationPipe) body: ReceiveOrderBody) {
     const result = await this.receiveOrderUseCase.execute(body);

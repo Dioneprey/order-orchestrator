@@ -18,4 +18,8 @@ export class FakeProcessOrderSchedule extends ProcessOrderSchedule {
   ): Promise<void> {
     this.jobs.push({ data, options });
   }
+
+  async removeJobById(id: string): Promise<void> {
+    this.jobs = this.jobs.filter((job) => job.options?.jobId !== id);
+  }
 }

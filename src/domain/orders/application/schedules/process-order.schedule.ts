@@ -9,4 +9,6 @@ export abstract class ProcessOrderSchedule {
     data: ProcessOrderParams,
     options?: ScheduleOptions,
   ): Promise<void>;
+
+  abstract removeJobById(id: string): Promise<void>;
 }
