@@ -40,10 +40,13 @@ API desenvolvida em NestJS para receber, validar, enriquecer e processar pedidos
 # 1️⃣ Clonar o repositório
 git clone https://github.com/Dioneprey/order-orchestrator.git
 
-# 2️⃣ Copiar variáveis de ambiente
+# 2️⃣ Entrar na pasta do repositório
+cd order-orchestrator
+
+# 3️⃣ Copiar variáveis de ambiente
 cp .env.example .env
 
-# 3️⃣ Build e execução de todos os containers
+# 4️⃣ Build e execução de todos os containers
 docker compose --profile api up --build -d
 ```
 
@@ -53,10 +56,13 @@ docker compose --profile api up --build -d
 # 1️⃣ Clonar o repositório
 git clone https://github.com/Dioneprey/order-orchestrator.git
 
-# 2️⃣ Copiar variáveis de ambiente
+# 2️⃣ Entrar na pasta do repositório
+cd order-orchestrator
+
+# 3️⃣ Copiar variáveis de ambiente
 cp .env.example .env
 
-# 3️⃣ Subir api em modo desenvolvimento
+# 4️⃣ Subir api em modo desenvolvimento
 docker compose up --build -d
 
 npm install           # Instalar dependências
