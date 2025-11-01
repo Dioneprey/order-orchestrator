@@ -35,7 +35,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   const config = new DocumentBuilder()
-    .setTitle('med-chat-ai-api')
+    .setTitle('order-orchestrator-api')
     .setDescription('API docs')
     .setVersion('1.0')
     .addApiKey({ type: 'apiKey', name: 'x-api-key', in: 'header' }, 'x-api-key')
