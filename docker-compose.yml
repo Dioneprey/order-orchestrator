@@ -18,7 +18,7 @@ services:
     networks:
       - inbazz-network
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:${PORT}/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT}/api/health"]
       interval: 10s
       timeout: 5s
       retries: 5

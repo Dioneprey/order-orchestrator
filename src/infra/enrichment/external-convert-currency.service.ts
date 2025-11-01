@@ -7,6 +7,8 @@ import {
   ProcessOrderParams,
 } from 'src/domain/orders/application/enrichment/convert-currency.service';
 import { Currency } from 'src/core/types/currency';
+import { RedisRepository } from '../database/redis/redis.service';
+import { buildCacheKey } from 'src/core/helpers/buid-cache-key';
 
 export interface CurrencyQuote {
   code: Currency; // moeda base
@@ -29,21 +31,49 @@ export interface CurrencyApiResponse {
 @Injectable()
 export class ExternalConvertCurrencyService implements ConvertCurrencyService {
   private readonly logger = new Logger(ExternalConvertCurrencyService.name);
-  constructor(private httpService: HttpService) {}
+  constructor(
+    private httpService: HttpService,
+    private redisRepository: RedisRepository,
+  ) {}
 
   async convert({ fromCurrency, toCurrency }: ProcessOrderParams): Promise<{
     rate: number;
   }> {
-    const { data } = await firstValueFrom(
-      this.httpService
-        .get<any>('https://economia.awesomeapi.com.br/json/last/USD')
-        .pipe(
-          catchError((error: AxiosError) => {
-            this.logger.error(error?.response?.data);
-            throw error;
-          }),
-        ),
-    );
+    const cacheKey = buildCacheKey({
+      baseKey: `current-exchange-rate`,
+    });
+
+    let data: CurrencyApiResponse | null = null;
+
+    const cached =
+      await this.redisRepository.get<CurrencyApiResponse>(cacheKey);
+
+    if (cached) {
+      data = cached;
+    } else {
+      const { data: responseData } = await firstValueFrom(
+        this.httpService
+          .get<CurrencyApiResponse>(
+            'https://economia.awesomeapi.com.br/json/last/USD',
+          )
+          .pipe(
+            catchError((error: AxiosError) => {
+              this.logger.error(error?.response?.data);
+              throw error;
+            }),
+          ),
+      );
+
+      const TEN_MINUTES_IN_SECONDS = 60 * 10;
+
+      await this.redisRepository.set(
+        cacheKey,
+        responseData,
+        TEN_MINUTES_IN_SECONDS,
+      );
+
+      data = responseData;
+    }
 
     const bid = parseFloat(data.USDBRL.bid);
 
