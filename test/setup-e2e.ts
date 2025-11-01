@@ -45,7 +45,7 @@ beforeAll(async () => {
 
   process.env.DATABASE_URL = databaseUrl;
 
-  execSync(`pnpm prisma db push --accept-data-loss`, {
+  execSync(`npx prisma db push --accept-data-loss`, {
     stdio: 'inherit',
     env: { ...process.env, DATABASE_URL: databaseUrl },
   });

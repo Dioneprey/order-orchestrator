@@ -47,7 +47,7 @@ cp .env.example .env
 docker compose --profile api up --build -d
 ```
 
-## Opção 2: Rodar localmente (Node + PNPM)
+## Opção 2: Rodar localmente (Node + NPM)
 
 ```bash
 # 1️⃣ Clonar o repositório
