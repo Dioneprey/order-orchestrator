@@ -48,9 +48,9 @@ jobs:
 
       - run: npm ci
 
-      - run: pnpm prisma generate
+      - run: npm prisma generate
 
-      - run: pnpm prisma migrate deploy
+      - run: npm prisma migrate deploy
 
       - run: npm run test:e2e
         env:
