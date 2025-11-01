@@ -64,6 +64,15 @@ npm run db:deploy     # Aplicar migrations e gerar Prisma Client
 npm run start:dev     # Rodar a API
 ```
 
+# 🔐 Autenticação da API
+
+A API utiliza autenticação simples baseada em API key.
+
+A chave pode ser informada via variável de ambiente e tem o seguinte valor padrão:
+```
+API_KEY=order-orchestrator-inbazz
+```
+
 # 🌐 URLs
 
 ## 📘 API
@@ -80,11 +89,14 @@ npm run start:dev     # Rodar a API
 
 ---
 
-## Funcionalidades
+## Rotas
+
+#### Autenticação
+Todos os endpoints requerem o **header** `x-api-key` com o valor da chave:
 
 ### Receber Pedido (Webhook)
 
-`POST /webhooks/orders`
+POST /webhooks/orders - Recebe dados de um pedido
 
 **Exemplo de payload:**
 
@@ -104,8 +116,7 @@ GET /orders — Lista pedidos (com filtro opcional por status)
 
 GET /orders/:id — Detalhes de um pedido
 
+DELETE /orders/:id — Deleta um pedido
+
 GET /queue/metrics — Informações gerais da fila (jobs em processamento, sucesso e falhas)
 
-```
-
-```
