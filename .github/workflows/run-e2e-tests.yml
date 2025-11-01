@@ -48,7 +48,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npm db:deploy
+      - run: npm run db:deploy
 
       - run: npm run test:e2e
         env:
